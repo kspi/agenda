@@ -1,0 +1,3 @@
+events.py
+*.pyc
+__pycache__
