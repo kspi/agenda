@@ -19,7 +19,7 @@ def main():
     if len(sys.argv) == 2:
         days = int(sys.argv[1])
     else:
-        days = 120
+        days = 62
     locale.setlocale(locale.LC_TIME, "lt_LT.utf8")
     today = date.today()
     prevday = today
