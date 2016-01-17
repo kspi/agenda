@@ -1,6 +1,9 @@
+import cache
+import sys
 from register import register_event
 from datetime import timedelta, date
 import requests
+import requests.exceptions
 from icalendar import Calendar, Event, prop
 
 def simple(month, day, title, year=None):
@@ -25,12 +28,17 @@ def from_ical_date(d):
     return prop.vDate.from_ical(d.to_ical().decode('utf-8'))
 
 def icalendar(name, url):
-    response = requests.get(url)
-    assert(response.status_code == 200)
-    body = response.text
-    cal = Calendar.from_ical(body)
+    def fetch():
+        response = requests.get(url)
+        assert(response.status_code == 200)
+        return response.text
     @register_event
     def icalendar_fn(day):
+        body = cache.get("{}.ics".format(name), 60 * 12, fetch)
+        if body is None:
+            # Cache empty and update failed.
+            return
+        cal = Calendar.from_ical(body)
         for e in cal.walk():
             if isinstance(e, Event):
                 title = e['SUMMARY']
@@ -39,4 +47,3 @@ def icalendar(name, url):
                 end = from_ical_date(e['DTEND'])
                 if start == day:
                     yield "{}: {} ({})".format(name, title, uid)
-
