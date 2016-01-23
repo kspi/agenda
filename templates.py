@@ -6,23 +6,31 @@ import requests
 import requests.exceptions
 from icalendar import Calendar, Event, prop
 
-def simple(month, day, title, year=None):
-    if year:
-        @register_event
-        def simple_fn(aday):
-            if aday.month == month and aday.day == day:
-                yield title.format(aday.year - year)
-    else:
-        @register_event
-        def simple_fn(aday):
-            if aday.month == month and aday.day == day:
-                yield title
+
+def once(year, month, day, title):
+    @register_event
+    def event_fn(aday):
+        if aday.year == year and aday.month == month and aday.day == day:
+            yield title
+
+def yearly(month, day, title):
+    @register_event
+    def event_fn(aday):
+        if aday.month == month and aday.day == day:
+            yield title
+
+def anniversary(year, month, day, title):
+    @register_event
+    def event_fn(aday):
+        if aday.month == month and aday.day == day:
+            yield title.format(aday.year - year)
 
 def birthday(month, day, name, year=None):
     if year:
-        simple(month, day, "Gimtadienis: " + name + ", sukanka {}", year)
+        anniversary(year, month, day, "Gimtadienis: " + name + ", sukanka {}")
     else:
-        simple(month, day, "Gimtadienis: " + name)
+        yearly(month, day, "Gimtadienis: " + name)
+
 
 def from_ical_date(d):
     return prop.vDate.from_ical(d.to_ical().decode('utf-8'))

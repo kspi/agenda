@@ -1,4 +1,3 @@
 icalendar
 requests
 pyephem
-py-dateutil

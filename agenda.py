@@ -1,7 +1,5 @@
 #!/usr/bin/env python3
 from datetime import date, datetime, timedelta
-from dateutil.parser import parse
-from dateutil.tz import tzlocal, tzutc
 import requests
 import icalendar
 from register import day_events
