@@ -26,13 +26,25 @@ def ical(days, file=sys.stdout.buffer):
     file.write(calendar.to_ical())
 
 
-def text(days, file=sys.stdout):
+def agenda(days, file=sys.stdout, color=False):
     today = date.today()
     prevday = today
     for day in datespan(today, today + timedelta(days=days)):
         events = list(day_events(day))
         if events:
-            print(day.strftime("%F %A"), file=file)
+            if color:
+                print("\x1b[34m{:%F %A}\x1b[0m".format(day), file=file)
+            else:
+                print("{:%F %A}".format(day), file=file)
             for event in events:
                 print(event, file=file)
             print(file=file)
+
+
+def txt(days, file=sys.stdout, color=False):
+    today = date.today()
+    prevday = today
+    for day in datespan(today, today + timedelta(days=days)):
+        events = list(day_events(day))
+        for event in events:
+            print("{:%F} {}".format(day, event), file=file)

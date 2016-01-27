@@ -3,7 +3,8 @@
 Programmable agenda.
 
 Usage:
-    agenda [--days=D]
+    agenda [--days=D] [--no-color]
+    agenda txt [--days=D]
     agenda ical [--ical-days=I]
     agenda server [--ical-days=I] [--host=HOST] [--port=PORT]
     agenda add DATE DESCRIPTION...
@@ -11,7 +12,8 @@ Usage:
 
 Options:
     -h --help      Show this screen.
-    --days=D       Report for this many days. [default: 14]
+    --days=D       Report for this many days. [default: 7]
+    --no-color     Don't use colors.
     --ical-days=I  Generate iCal for this many days. [default: 62]
     --host=HOST    Server host. [default: localhost]
     --port=PORT    Server port. [default: 7000]
@@ -30,6 +32,8 @@ def main():
     load_events()
     if arguments['ical']:
         report.ical(int(arguments['--ical-days']))
+    elif arguments['txt']:
+        report.txt(int(arguments['--days']))
     elif arguments['server']:
         server.run(
             int(arguments['--ical-days']),
@@ -38,7 +42,7 @@ def main():
     elif arguments['add']:
         add(arguments['DATE'], ' '.join(arguments['DESCRIPTION']))
     else:
-        report.text(int(arguments['--days']))
+        report.agenda(int(arguments['--days']), color=not arguments['--no-color'])
 
 
 if __name__ == '__main__':
