@@ -4,8 +4,9 @@ Programmable agenda.
 
 Usage:
     agenda [--days=D] [--no-color]
-    agenda txt [--days=D]
-    agenda ical [--ical-days=I]
+    agenda show [--days=D] [--no-color] [TAGS...]
+    agenda txt [--days=D] [TAGS...]
+    agenda ical [--ical-days=I] [TAGS...]
     agenda server [--ical-days=I] [--host=HOST] [--port=PORT]
     agenda add DATE DESCRIPTION...
     agenda -h | --help
@@ -29,20 +30,24 @@ from agenda.add import add
 def main():
     arguments = docopt(__doc__)
 
+    ical_days = int(arguments['--ical-days'])
+    days = int(arguments['--days'])
+    tags = arguments['TAGS']
+
     load_events()
-    if arguments['ical']:
-        report.ical(int(arguments['--ical-days']))
-    elif arguments['txt']:
-        report.txt(int(arguments['--days']))
+    if arguments['add']:
+        add(arguments['DATE'], ' '.join(arguments['DESCRIPTION']))
     elif arguments['server']:
         server.run(
-            int(arguments['--ical-days']),
+            ical_days,
             arguments['--host'],
             int(arguments['--port']))
-    elif arguments['add']:
-        add(arguments['DATE'], ' '.join(arguments['DESCRIPTION']))
+    elif arguments['ical']:
+        report.ical(ical_days, tags)
+    elif arguments['txt']:
+        report.txt(days, tags)
     else:
-        report.agenda(int(arguments['--days']), color=not arguments['--no-color'])
+        report.agenda(days, tags, color=not arguments['--no-color'])
 
 
 if __name__ == '__main__':

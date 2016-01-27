@@ -2,6 +2,7 @@ from datetime import date, datetime, timedelta
 import icalendar
 import sys
 from agenda.register import day_events
+import re
 
 
 def datespan(start, end, delta=timedelta(days=1)):
@@ -11,13 +12,18 @@ def datespan(start, end, delta=timedelta(days=1)):
         cur += delta
 
 
-def ical(days, file=sys.stdout.buffer):
+def tag_filter(events, tags):
+    trs = [re.compile(r'{}\b'.format(re.escape(t))) for t in tags]
+    for e in events:
+        if all(tr.search(e) for tr in trs):
+            yield e
+
+def ical(days, tags=[], file=sys.stdout.buffer):
     today = date.today()
     prevday = today
     calendar = icalendar.Calendar()
     for day in datespan(today, today + timedelta(days=days)):
-        events = list(day_events(day))
-        for name in events:
+        for name in tag_filter(day_events(day), tags):
             event = icalendar.Event()
             event.add('SUMMARY', name)
             event.add('DTSTART', day)
@@ -26,11 +32,11 @@ def ical(days, file=sys.stdout.buffer):
     file.write(calendar.to_ical())
 
 
-def agenda(days, file=sys.stdout, color=False):
+def agenda(days, tags=[], file=sys.stdout, color=False):
     today = date.today()
     prevday = today
     for day in datespan(today, today + timedelta(days=days)):
-        events = list(day_events(day))
+        events = list(tag_filter(day_events(day), tags))
         if events:
             if color:
                 print("\x1b[34m{:%F %A}\x1b[0m".format(day), file=file)
@@ -41,10 +47,9 @@ def agenda(days, file=sys.stdout, color=False):
             print(file=file)
 
 
-def txt(days, file=sys.stdout, color=False):
+def txt(days, tags=[], file=sys.stdout, color=False):
     today = date.today()
     prevday = today
     for day in datespan(today, today + timedelta(days=days)):
-        events = list(day_events(day))
-        for event in events:
+        for event in tag_filter(day_events(day), tags):
             print("{:%F} {}".format(day, event), file=file)
