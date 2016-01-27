@@ -7,6 +7,10 @@ ENVIRONMENT = globals()
 import os
 from xdg.BaseDirectory import save_config_path
 
+def events_path():
+    return save_config_path('agenda')
+
+
 def load_py(filename):
     with open(filename) as f:
         code = compile(f.read(), filename, 'exec')
@@ -24,7 +28,7 @@ def load_txt(filename):
 def load_events():
     events_directories = [
         os.path.join(os.path.dirname(os.path.realpath(__file__)), 'events'),
-        save_config_path('agenda'),
+        events_path(),
     ]
     for events_dir in events_directories:
         for root, subdirs, files in os.walk(events_dir):
