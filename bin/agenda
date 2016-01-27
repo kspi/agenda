@@ -2,11 +2,11 @@
 from datetime import date, datetime, timedelta
 import requests
 import icalendar
-from register import day_events
-import events
-import locale
 import sys
 import http.server
+
+from agenda.events import load_events
+from agenda.register import day_events
 
 DAYS = 62
 
@@ -56,8 +56,7 @@ def server():
 
 
 def main():
-    locale.setlocale(locale.LC_TIME, "lt_LT.utf8")
-
+    load_events()
     if len(sys.argv) > 1 and sys.argv[1] == '--ical':
         print(get_ical())
     elif len(sys.argv) > 1 and sys.argv[1] == '--server':

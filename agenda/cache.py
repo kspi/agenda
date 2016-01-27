@@ -1,11 +1,10 @@
 import os
 import sys
 import time
-
-CACHE_PATH = os.path.join(os.path.dirname(__file__), 'cache')
+from xdg.BaseDirectory import save_cache_path
 
 def get(name, max_age, update_fn):
-    filename = os.path.join(CACHE_PATH, name)
+    filename = os.path.join(save_cache_path('agenda'), name)
     value = None
 
     def update_value():
@@ -15,7 +14,6 @@ def get(name, max_age, update_fn):
             with open(filename, 'wb') as f:
                 f.write(value.encode('utf-8'))
         except Exception as e:
-            #sys.stderr.write("warning: cache update {} failed: {}\n".format(name, e))
             pass
 
     def read_cached():

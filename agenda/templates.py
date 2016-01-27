@@ -1,10 +1,10 @@
-import cache
 import sys
-from register import register_event
 from datetime import timedelta, date
 import requests
 import requests.exceptions
 from icalendar import Calendar, Event, prop
+from agenda import cache
+from agenda.register import register_event
 
 
 def once(year, month, day, title):
