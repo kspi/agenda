@@ -7,6 +7,7 @@ Usage:
     agenda show [--days=D] [--no-color] [TAGS...]
     agenda txt [--days=D] [TAGS...]
     agenda ical [--ical-days=I] [TAGS...]
+    agenda todotxt
     agenda server [--ical-days=I] [--host=HOST] [--port=PORT]
     agenda add DATE DESCRIPTION...
     agenda -h | --help
@@ -20,11 +21,24 @@ Options:
     --port=PORT    Server port. [default: 7000]
 """
 from docopt import docopt
+from subprocess import check_call
+import re
+from datetime import datetime
 
-from agenda.events import load_events
+from agenda.events import load_events, day_events
 from agenda import server
 from agenda import report
 from agenda.add import add
+
+
+def replace_tag(item, tag, repl):
+    assert tag.startswith('@')
+    if repl == '':
+        # If removing tag, remove preceeding spaces too.
+        tag_re = r'\s*{}\b'.format(re.escape(tag))
+    else:
+        tag_re = r'{}\b'.format(re.escape(tag))
+    return re.sub(tag_re, '', item)
 
 
 def main():
@@ -42,6 +56,10 @@ def main():
             ical_days,
             arguments['--host'],
             int(arguments['--port']))
+    elif arguments['todotxt']:
+        for item in day_events(datetime.today()):
+            item = replace_tag(item, '@todo', '')
+            check_call(["todo.sh", "add", item])
     elif arguments['ical']:
         report.ical(ical_days, tags)
     elif arguments['txt']:
