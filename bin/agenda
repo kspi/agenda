@@ -8,7 +8,7 @@ Usage:
     agenda txt [--days=D] [TAGS...]
     agenda ical [--ical-days=I] [TAGS...]
     agenda todotxt
-    agenda server [--ical-days=I] [--host=HOST] [--port=PORT]
+    agenda server [--ical-days=I] [--host=HOST] [--port=PORT] [TAGS...]
     agenda add DATE DESCRIPTION...
     agenda -h | --help
 
@@ -54,6 +54,7 @@ def main():
     elif arguments['server']:
         server.run(
             ical_days,
+            tags,
             arguments['--host'],
             int(arguments['--port']))
     elif arguments['todotxt']:

@@ -7,7 +7,7 @@ ENVIRONMENT = globals()
 import os
 from xdg.BaseDirectory import save_config_path
 
-from agenda.register import day_events
+from agenda.register import day_events, clear
 __all__ = ['events_path', 'load_events', 'day_events']
 
 def events_path() -> str:
@@ -38,6 +38,7 @@ def load_events():
         os.path.join(os.path.dirname(os.path.realpath(__file__)), 'events'),
         events_path(),
     ]
+    clear()
     for events_dir in events_directories:
         for root, subdirs, files in os.walk(events_dir):
             for f in files:
