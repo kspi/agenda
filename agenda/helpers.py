@@ -4,5 +4,12 @@ monday, tuesday, wednesday, thursday, friday, saturday, sunday = range(7)
 mon, tue, wed, thur, fri, sat, sun = range(7)
 
 def is_nth_weekday(weekday, n, day):
-    d = n + 1 if n >= 0 else n
-    return day.weekday() == weekday and day.month != (day - timedelta(days=d * 7)).month
+    if day.weekday() != weekday:
+        return False
+    if n >= 0:
+        return ((n == 0 or day.month == (day - timedelta(days=(n - 1) * 7)).month)
+                and day.month != (day - timedelta(days=n * 7)).month)
+    else:
+        n *= -1
+        return ((n == 0 or day.month == (day + timedelta(days=(n - 1) * 7)).month)
+                and day.month != (day + timedelta(days=n * 7)).month)
