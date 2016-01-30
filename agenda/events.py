@@ -7,7 +7,14 @@ ENVIRONMENT = globals()
 import os
 from xdg.BaseDirectory import save_config_path
 
-def events_path():
+from agenda.register import day_events
+__all__ = ['events_path', 'load_events', 'day_events']
+
+def events_path() -> str:
+    """Path where user event definitions are loaded from.
+
+    They can be .py or .txt files.
+    """
     return save_config_path('agenda')
 
 
@@ -26,6 +33,7 @@ def load_txt(filename):
 
 
 def load_events():
+    """Load event definitions."""
     events_directories = [
         os.path.join(os.path.dirname(os.path.realpath(__file__)), 'events'),
         events_path(),
