@@ -23,7 +23,7 @@ Options:
 from docopt import docopt
 from subprocess import check_call
 import re
-from datetime import datetime
+from datetime import date
 
 from agenda.events import load_events, day_events
 from agenda import server
@@ -58,7 +58,7 @@ def main():
             arguments['--host'],
             int(arguments['--port']))
     elif arguments['todotxt']:
-        for item in day_events(datetime.today()):
+        for item in day_events(date.today()):
             item = replace_tag(item, '@todo', '')
             check_call(["todo.sh", "add", item])
     elif arguments['ical']:
