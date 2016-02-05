@@ -37,21 +37,25 @@ def from_ical_date(d):
 
 def icalendar(name, url):
     def fetch():
-        response = requests.get(url)
-        assert(response.status_code == 200)
-        return response.text
+        try:
+            response = requests.get(url, timeout=1)
+            assert(response.status_code == 200)
+            return response.text
+        except e:
+            print("icalendar {} failed: {}".format(name, e))
+            return None
+    body = cache.get("{}.ics".format(name), 60 * 12, fetch)
+    if body is None:
+        # Cache empty and update failed.
+        return
+    cal = Calendar.from_ical(body)
     @register_event
     def icalendar_fn(day):
-        body = cache.get("{}.ics".format(name), 60 * 12, fetch)
-        if body is None:
-            # Cache empty and update failed.
-            return
-        cal = Calendar.from_ical(body)
         for e in cal.walk():
             if isinstance(e, Event):
                 title = e['SUMMARY']
-                uid = e['UID']
+                url = e.get('URL', None) or e['UID']
                 start = from_ical_date(e['DTSTART'])
                 end = from_ical_date(e['DTEND'])
                 if start == day:
-                    yield "{}: {} ({})".format(name, title, uid)
+                    yield "{}: {} ({})".format(name, title, url)

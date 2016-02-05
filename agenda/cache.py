@@ -9,12 +9,10 @@ def get(name, max_age, update_fn):
 
     def update_value():
         nonlocal value
-        try:
-            value = update_fn()
+        value = update_fn()
+        if value is not None:
             with open(filename, 'wb') as f:
                 f.write(value.encode('utf-8'))
-        except Exception as e:
-            pass
 
     def read_cached():
         nonlocal value
