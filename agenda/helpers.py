@@ -7,6 +7,7 @@ def is_nth_weekday(weekday, n, day):
     if day.weekday() != weekday:
         return False
     if n >= 0:
+        n += 1
         return ((n == 0 or day.month == (day - timedelta(days=(n - 1) * 7)).month)
                 and day.month != (day - timedelta(days=n * 7)).month)
     else:
