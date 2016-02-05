@@ -1,8 +1,7 @@
 from datetime import date, datetime, timedelta
 import icalendar
 import sys
-from agenda.register import day_events
-import re
+from agenda.events import day_events, tag_filter
 
 
 def datespan(start, end, delta=timedelta(days=1)):
@@ -11,13 +10,6 @@ def datespan(start, end, delta=timedelta(days=1)):
         yield cur
         cur += delta
 
-
-def tag_filter(events, tags):
-    included_res = [re.compile(r'{}\b'.format(re.escape(t))) for t in tags if not t.startswith('-')]
-    excluded_res = [re.compile(r'{}\b'.format(re.escape(t[1:]))) for t in tags if t.startswith('-')]
-    for e in events:
-        if all(r.search(e) for r in included_res) and not any(r.search(e) for r in excluded_res):
-            yield e
 
 def ical(days, tags=[], file=sys.stdout.buffer):
     today = date.today()

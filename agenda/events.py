@@ -2,13 +2,16 @@ from agenda.helpers import *
 from agenda.templates import *
 from datetime import datetime
 
+HIDDEN_TAGS = []
+
 ENVIRONMENT = globals()
 
 import os
+import re
 from xdg.BaseDirectory import save_config_path
 
 from agenda.register import day_events, clear
-__all__ = ['events_path', 'load_events', 'day_events']
+__all__ = ['events_path', 'load_events', 'day_events', 'tag_filter']
 
 def events_path() -> str:
     """Path where user event definitions are loaded from.
@@ -16,6 +19,27 @@ def events_path() -> str:
     They can be .py or .txt files.
     """
     return save_config_path('agenda')
+
+def tag_filter(events, tags):
+    for h in HIDDEN_TAGS:
+        if h not in tags:
+            tags.append('-' + h)
+    included_res = [re.compile(r'{}\b'.format(re.escape(t))) for t in tags if not t.startswith('-')]
+    excluded_res = [re.compile(r'{}\b'.format(re.escape(t[1:]))) for t in tags if t.startswith('-')]
+    for e in events:
+        if all(r.search(e) for r in included_res) and not any(r.search(e) for r in excluded_res):
+            yield e
+
+def replace_tag(item, tag, repl):
+    assert tag.startswith('@')
+    if repl == '':
+        # If removing tag, remove preceeding spaces too.
+        tag_re = r'\s*{}\b'.format(re.escape(tag))
+    else:
+        tag_re = r'{}\b'.format(re.escape(tag))
+    return re.sub(tag_re, repl, item)
+
+
 
 
 def load_py(filename):
