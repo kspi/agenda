@@ -39,10 +39,13 @@ def icalendar(name, url):
     def fetch():
         try:
             response = requests.get(url, timeout=1)
-            assert(response.status_code == 200)
-            return response.text
-        except e:
-            print("icalendar {} failed: {}".format(name, e))
+            if response.status_code == 200:
+                return response.text
+            else:
+                print("icalendar:{}: HTTP response not OK: {}".format(name, response.status_code))
+                return None
+        except requests.exceptions.RequestException as e:
+            print("icalendar:{}: {}".format(name, e))
             return None
     body = cache.get("{}.ics".format(name), 60 * 12, fetch)
     if body is None:
