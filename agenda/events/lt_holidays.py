@@ -6,14 +6,13 @@ yearly(3, 11, "Valstybinė šventė: Lietuvos nepriklausomybės atkūrimo diena 
 
 @register_event
 def easter(day):
-    if (day.weekday() in frozenset([sunday, monday])
-            and date(day.year, 3, 22) <= day <= date(day.year, 4, 25)):
+    if day.weekday() in frozenset([sunday, monday]) and 3 <= day.month <= 4:
         spring_equinox = ephem.next_equinox(str(day.year))
         full_moon = ephem.next_full_moon(spring_equinox)
         easter_day = full_moon.datetime().date() + timedelta(days=1)
         while easter_day.weekday() != sunday:
             easter_day += timedelta(days=1)
-        if day == easter_day or day == easter_day + timedelta(days=1):
+        if day in [easter_day, easter_day + timedelta(days=1)]:
             yield "Valstybinė šventė: Velykos"
 
 yearly(5, 1, "Valstybinė šventė: darbo diena")
