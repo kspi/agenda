@@ -1,7 +1,7 @@
 import sys
 from datetime import timedelta, date
-import requests
-import requests.exceptions
+import urllib.request
+import urllib.error
 from icalendar import Calendar, Event, prop
 from agenda import cache
 from agenda.register import register_event
@@ -38,13 +38,9 @@ def from_ical_date(d):
 def icalendar(name, url):
     def fetch():
         try:
-            response = requests.get(url, timeout=1)
-            if response.status_code == 200:
-                return response.text
-            else:
-                print("icalendar:{}: HTTP response not OK: {}".format(name, response.status_code))
-                return None
-        except requests.exceptions.RequestException as e:
+            response = urllib.request.urlopen(url, timeout=1)
+            return response.read().decode('utf-8')
+        except urllib.error.URLError as e:
             print("icalendar:{}: {}".format(name, e))
             return None
     body = cache.get("{}.ics".format(name), 60 * 12, fetch)

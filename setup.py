@@ -22,7 +22,6 @@ setup(
 
     install_requires=[
         "icalendar",
-        "requests",
         "pyephem",
         "pyxdg",
         "parsedatetime",
