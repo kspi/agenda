@@ -1,6 +1,7 @@
 from agenda.helpers import *
 from agenda.templates import *
 from datetime import datetime
+from typing import List, Iterable, Tuple
 
 HIDDEN_TAGS = []
 
@@ -11,7 +12,7 @@ import re
 from xdg.BaseDirectory import save_config_path
 
 from agenda.register import day_events, clear
-__all__ = ['events_path', 'load_events', 'day_events', 'tag_filter']
+__all__ = ['events_path', 'load_events', 'day_events', 'tag_filter', 'between', 'replace_tag']
 
 def events_path() -> str:
     """Path where user event definitions are loaded from.
@@ -21,6 +22,7 @@ def events_path() -> str:
     return save_config_path('agenda')
 
 def tag_filter(events, tags):
+    """Filter event iterator by given tags."""
     for h in HIDDEN_TAGS:
         if h not in tags:
             tags.append('-' + h)
@@ -72,3 +74,21 @@ def load_events():
                 elif filename.endswith('.py'):
                     load_py(filename)
 
+
+def date_span(start: datetime, end: datetime, delta: timedelta=timedelta(days=1)):
+    """Generate dates from 'start' to 'end', non-inclusive."""
+    cur = start
+    while cur < end:
+        yield cur
+        cur += delta
+
+def on(day: datetime, tags: List[str]=[]) -> Iterable[Tuple[datetime, str]]:
+    """Generate events for 'day', optionally filtered by tags."""
+    return tag_filter(day_events(day), tags)
+
+def between(start: datetime, end: datetime, tags: List[str]=[]) -> Iterable[Tuple[datetime, str]]:
+    """Generate events from 'start' to 'end' (non-inclusive)
+    """
+    for day in date_span(start, end):
+        for item in tag_filter(day_events(day), tags):
+            yield day, item
