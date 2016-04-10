@@ -25,5 +25,6 @@ setup(
         "pyephem",
         "pyxdg",
         "parsedatetime",
+        "caldav",
     ],
 )
