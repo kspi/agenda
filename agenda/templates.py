@@ -80,15 +80,19 @@ def icalendar(name, url):
 
 def caldav(name, url):
     def build():
-        cal = Calendar()
-        dav = DAVClient(url)
-        for calendar in dav.principal().calendars():
-            for event in calendar.events():
-                evcal = Calendar.from_ical(event.data)
-                for e in evcal.walk():
-                    if isinstance(e, Event):
-                        cal.add_component(e)
-        return cal.to_ical().decode('utf-8')
+        try:
+            cal = Calendar()
+            dav = DAVClient(url)
+            for calendar in dav.principal().calendars():
+                for event in calendar.events():
+                    evcal = Calendar.from_ical(event.data)
+                    for e in evcal.walk():
+                        if isinstance(e, Event):
+                            cal.add_component(e)
+            return cal.to_ical().decode('utf-8')
+        except OSError as e:
+            print("caldav:{}: {}".format(name, e))
+            return None
     data = cache.get("{}.ics".format(name), 60 * 12, build)
     if data is None:
         # Cache empty and update failed.
